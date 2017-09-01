@@ -11,4 +11,5 @@ export type LearningSet = {
     name: string,
     createDate: string,
     repeats: Array<Repeat>,
+    archived: boolean,
 };

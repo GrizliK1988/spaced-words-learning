@@ -3,20 +3,23 @@
 import { AsyncStorage } from 'react-native';
 
 import type { Dispatch, State } from '../types/State';
+import type { LearningSet } from '../types/LearningSet';
 
-export const ADD_SET = 'ADD_SET';
+export const REMOVE_SET = 'REMOVE_SET';
 
-export type AddLearningSetAction = {
+export type RemoveLearningSetAction = {
     type: string,
+    set: LearningSet,
 };
 
 /**
  * @return {Function}
  */
-export function addLearningSet(): Function {
+export function removeLearningSet(set: LearningSet): Function {
     return (dispatch: Dispatch, getState: () => State) => {
         dispatch({
-            type: ADD_SET,
+            type: REMOVE_SET,
+            set,
         });
 
         AsyncStorage

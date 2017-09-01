@@ -2,21 +2,24 @@
 
 import { AsyncStorage } from 'react-native';
 
+import type { LearningSet } from '../types/LearningSet';
 import type { Dispatch, State } from '../types/State';
 
-export const ADD_SET = 'ADD_SET';
+export const ARCHIVE_SET = 'ARCHIVE_SET';
 
-export type AddLearningSetAction = {
+export type ArchiveLearningSetAction = {
     type: string,
+    set: LearningSet,
 };
 
 /**
  * @return {Function}
  */
-export function addLearningSet(): Function {
+export function archiveLearningSet(set: LearningSet): Function {
     return (dispatch: Dispatch, getState: () => State) => {
         dispatch({
-            type: ADD_SET,
+            type: ARCHIVE_SET,
+            set,
         });
 
         AsyncStorage

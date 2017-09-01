@@ -4,10 +4,19 @@ import moment from 'moment';
 import React from 'react';
 import { connect } from 'react-redux';
 import { StyleSheet, Text, TextInput, View, Button, ScrollView } from 'react-native';
-import { addLearningSet } from '../actions/AddLearningSetAction';
-import { changeLearningSetName } from '../actions/UpdateLearningSetAction';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+} from 'react-native-popup-menu';
 
-import type { LearningSet } from '../types/LearningSet';
+import { removeLearningSet } from '../actions/RemoveLearningSetAction';
+import { archiveLearningSet } from '../actions/ArchiveLearningSetAction';
+import { addLearningSet } from '../actions/AddLearningSetAction';
+import { changeLearningSetName, markLearningSetLearned } from '../actions/UpdateLearningSetAction';
+
+import type { LearningSet, Repeat } from '../types/LearningSet';
 import type { Dispatch, State } from '../types/State';
 
 type ConnectedProps = {
@@ -16,7 +25,10 @@ type ConnectedProps = {
 
 type ConnectedActions = {
     onAddSet: () => void,
+    onRemoveSet: (set: LearningSet) => void,
+    onArchiveSet: (set: LearningSet) => void,
     onChangeSetName: (name: string, set: LearningSet) => void,
+    onLearnSet: (set: LearningSet, repeat: Repeat) => void,
 };
 
 type Props = ConnectedProps & ConnectedActions;
@@ -48,6 +60,13 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 20,
     },
+    colAction: {
+        flex: 0.4,
+        height: 20,
+    },
+    colMargin: {
+        marginRight: 5,
+    },
     col6: {
         flex: 6,
         height: 20,
@@ -68,11 +87,23 @@ const styles = StyleSheet.create({
         marginRight: 5,
         paddingLeft: 5,
     },
+
+    todaySet: {
+        backgroundColor: '#567714',
+    },
+    lateSet: {
+        backgroundColor: '#801515',
+    },
+    white: {
+        color: 'white',
+    },
 });
 
 const TodayDate = moment().format('YYYY-MM-DD');
 
-const LearningSets = ({ learningSets, onAddSet, onChangeSetName }: Props) => (
+const LearningSets = (
+    { learningSets, onAddSet, onChangeSetName, onLearnSet, onRemoveSet, onArchiveSet }: Props,
+) => (
     <View style={styles.container}>
         <ScrollView style={styles.contentContainer}>
             <View style={styles.row}>
@@ -100,9 +131,10 @@ const LearningSets = ({ learningSets, onAddSet, onChangeSetName }: Props) => (
                 <View style={styles.col}>
                     <Text style={styles.text}>Rep 7</Text>
                 </View>
+                <View style={styles.colAction} />
             </View>
             {
-                learningSets.map((set: LearningSet) => (
+                learningSets.filter(s => !s.archived).map((set: LearningSet) => (
                     <View key={set.id} style={styles.row}>
                         <View style={styles.col}>
                             <TextInput
@@ -115,12 +147,38 @@ const LearningSets = ({ learningSets, onAddSet, onChangeSetName }: Props) => (
                             set.repeats.map(repeat => (
                                 <View
                                     key={repeat.id}
-                                    style={styles.col}
+                                    style={[
+                                        styles.col,
+                                        styles.colMargin,
+                                        repeat.date === TodayDate && !repeat.learned ?
+                                            styles.todaySet : {},
+                                        repeat.date < TodayDate && !repeat.learned ?
+                                            styles.lateSet : {},
+                                    ]}
                                 >
-                                    <Text style={[styles.text]}>{moment(repeat.date).format('d-MMM-YY')}</Text>
+                                    <Text
+                                        style={[
+                                            styles.text,
+                                            repeat.date <= TodayDate && !repeat.learned ?
+                                                styles.white : {},
+                                        ]}
+                                        onPress={() =>
+                                            repeat.date <= TodayDate && onLearnSet(set, repeat)}
+                                    >
+                                        {moment(repeat.date).format('d-MMM-YY')}
+                                    </Text>
                                 </View>
                             ))
                         }
+                        <View style={styles.colAction}>
+                            <Menu>
+                                <MenuTrigger text="upd" customStyles={{ triggerText: { color: '#0D4D4D' } }} />
+                                <MenuOptions>
+                                    <MenuOption onSelect={() => onRemoveSet(set)} text="Delete" />
+                                    <MenuOption onSelect={() => onArchiveSet(set)} text="Archive" />
+                                </MenuOptions>
+                            </Menu>
+                        </View>
                     </View>
                 ))
             }
@@ -145,7 +203,10 @@ const mapStateToProps = (state: State): ConnectedProps => ({
 
 const mapDispatchToProps = (dispatch: Dispatch): ConnectedActions => ({
     onAddSet: () => dispatch(addLearningSet()),
+    onRemoveSet: (set: LearningSet) => dispatch(removeLearningSet(set)),
+    onArchiveSet: (set: LearningSet) => dispatch(archiveLearningSet(set)),
     onChangeSetName: (name: string, set: LearningSet) => dispatch(changeLearningSetName(name, set)),
+    onLearnSet: (set: LearningSet, repeat: Repeat) => dispatch(markLearningSetLearned(set, repeat)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LearningSets);

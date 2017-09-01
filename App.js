@@ -1,4 +1,5 @@
 import React from 'react';
+import { MenuContext } from 'react-native-popup-menu';
 import { Provider } from 'react-redux';
 import store from './src/Store';
 import { loadLearningSets } from './src/actions/LoadLearningSetsAction';
@@ -10,7 +11,9 @@ export default class App extends React.Component {
     render() {
         return (
             <Provider store={store}>
-                <LearningSets />
+                <MenuContext>
+                    <LearningSets />
+                </MenuContext>
             </Provider>
         );
     }
