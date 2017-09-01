@@ -165,7 +165,7 @@ const LearningSets = (
                                         onPress={() =>
                                             repeat.date <= TodayDate && onLearnSet(set, repeat)}
                                     >
-                                        {moment(repeat.date).format('d-MMM-YY')}
+                                        {moment(repeat.date).format('D-MMM-YY')}
                                     </Text>
                                 </View>
                             ))

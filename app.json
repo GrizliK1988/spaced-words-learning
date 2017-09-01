@@ -1,5 +1,15 @@
 {
   "expo": {
-    "sdkVersion": "20.0.0"
+    "name": "Spaced Learning",
+    "icon": "./Icon-44@2x.png",
+    "sdkVersion": "20.0.0",
+    "ios": {
+      "bundleIdentifier": "com.julia_dima.spaced_learning"
+    },
+    "android": {
+      "package": "com.julia_dima.spaced_learning"
+    },
+    "version": "0.0.1",
+    "slug": "spaced-learning"
   }
 }
